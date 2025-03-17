@@ -1,27 +1,24 @@
-const http = require("http");
-const fs = require("fs");
-const url = require("url");
+const express = require("express");
+const app = express();
+const path = require("path");
 
-http
-  .createServer((req, res) => {
-    const q = url.parse(req.url, true);
-    let filename = `.${q.pathname === "/" ? "/index.html" : q.pathname}`;
-    fs.readFile(filename, (err, data) => {
-      if (err) {
-        fs.readFile("./404.html", (err404, errorData) => {
-          if (err404) {
-            res.writeHead(404, { "Content-type": "text/html" });
-            res.end("404 Not Found");
-          } else {
-            res.writeHead(404, { "Content-type": "text/html" });
-            res.end(errorData);
-          }
-        });
-        return;
-      }
-      res.writeHead(200, { "Content-type": "text/html" });
-      res.write(data);
-      res.end();
-    });
-  })
-  .listen(8080);
+app.get("/", (req, res) => {
+  const filePath = path.join(__dirname, "./index.html");
+  res.sendFile(filePath);
+});
+
+app.get("/about", (req, res) => {
+  const filePath = path.join(__dirname, "./about.html");
+  res.sendFile(filePath);
+});
+
+app.get("/contact-me", (req, res) => {
+  const filePath = path.join(__dirname, "./contact-me.html");
+  res.sendFile(filePath);
+});
+
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, "./404.html"));
+});
+
+app.listen(3000);
